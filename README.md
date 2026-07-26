@@ -4,16 +4,18 @@ Review code changes for **architectural ownership** — not code quality.
 
 Built for the case where you are shipping faster than you can read: agents write the code, it works, it merges, and three days later you cannot explain the component you are about to iterate on. This skill closes that gap without slowing the ship rate.
 
-Every run traces each change through four links:
+A skill for [Claude Code](https://claude.com/claude-code). Every run walks one **trace**:
 
-> **what changed** → **which component** → **what it means for the system** → **what to open in the IDE**
+> **the code that changed** → **which component** → **what it means for the system** → **what it means for users**
 
 ## What it actually does
 
 - **Groups a diff by intent**, not by file — "added retry to the ingestion path (3 files)", not `client.ts +40 −3`.
-- **Sources the "why" from the plan.** In a [cozyplan](../cozyplan) repo, commits resolve to the plan that owns them, so intent is quoted rather than guessed.
-- **Detects drift** — where the implementation quietly diverged from what the plan said. Nothing else in the toolchain catches this.
+- **Sources the "why" from what the repo already records** — plans, decision logs, defect registers, ADRs. It discovers these by shape rather than expecting fixed paths, because most repos keep an excellent why-layer under names nobody standardized.
+- **Detects drift** — where the implementation quietly diverged from what the plan said.
 - **Detects incomplete changes** — a contract changed but one call site wasn't updated, a schema changed with no migration, a new branch with no error path. The most common agent failure mode.
+- **Detects mirror divergence** — the same artifact living in two trees where only one of them moved, so a fix lands in a tree that nothing ships.
+- **Compounds.** Each review reads the ones before it, so it carries forward what's established, reopens unresolved questions, and flags prior claims the new changes contradict. Drift across reviews is the only drift a single diff cannot show.
 - **Shows the decisive code** — leads with the one or two lines that *are* the change, before and after, annotated in place. Not the whole diff; the 10% that carries the meaning.
 - **Gates on explanation** — ends with questions it deliberately didn't answer. Reading an AI explanation feels like understanding; these check whether it was.
 
@@ -54,12 +56,14 @@ Tiered by what the repo already has. Nothing is required.
 
 | Present | Effect |
 | --- | --- |
-| `specs/*.html` (cozyplan) | Intent is `✓` verified. Drift detection works. |
-| `SYSTEM.md` | Component mapping and system impact are `✓` rather than `~`. |
-| `CONTEXT.md` / `STACK.md` / `docs/adr/` | Reviews use your vocabulary and can flag real convention breaks. |
+| Plans (`specs/*.html`, from [cozyplan](https://github.com/smcozart/cozyplan)) | Intent is `✓` verified. Drift detection works. |
+| `SYSTEM.md` — a component map | Component mapping and system impact are `✓` rather than `~`. |
+| A decision log or defect register, under any name | Reviews cite real rationale and can flag genuine convention breaks. |
 | *(bare repo)* | Falls back to git history and code inference, marked `~`/`?`. Still useful — and it names which artifact would most improve the next run. |
 
-cozyreview never writes `SYSTEM.md` — the `discuss` skill owns it. It *proposes* rows, since one line written once permanently upgrades every future review in that repo.
+Nothing is required, and the discovery step means you rarely have to rename anything to get the benefit — `architecture_decisions.md`, `docs/decisions/`, `FINDINGS.md`, and `docs/adr/` all count.
+
+cozyreview never writes `SYSTEM.md` — it *proposes* rows and leaves the decision to you, since one line written once permanently upgrades every future review in that repo.
 
 ## Scope
 
