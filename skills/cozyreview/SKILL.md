@@ -67,6 +67,19 @@ Tier the run by what exists. Never require any of it.
 | `docs/adr/` | `docs/adr/NNNN-*.md` | The "why" behind standing decisions |
 | `CLAUDE.md` | repo root / nested | House rules a change may be violating |
 
+The paths above are the **conventional** homes, not the only ones. Most real repos keep an excellent why-layer under names nobody standardized, so **discover it rather than expect it** — a repo with no `docs/adr/` very often has the same content elsewhere. Look for these shapes, near the root and one or two levels into each component tree:
+
+| Shape | Looks like | Seen as |
+| --- | --- | --- |
+| Decision log | numbered decisions with a status, in one file or one directory | `architecture_decisions.md`, `docs/decisions/`, `DECISIONS.md`, `adr/` |
+| Defect register | numbered findings with severity and resolution | `FINDINGS.md`, `ISSUES.md`, `docs/bugs/` |
+| Naming/convention doc | tables mapping concepts to concrete names | `NAMING.md`, `CONVENTIONS.md` |
+| Handoff / session log | dated session state, "what's in flight" | `HANDOFF.md`, `WORKLOG.md`, `docs/handoffs/` |
+
+**Report what you found** in the briefing header. A tier claim the user cannot check is worthless — name the artifacts that actually carried the intent so they know which layer did the work.
+
+Bound the search: these shapes, these depths, filenames and headings only. Do not read every markdown file in the tree — the point is to find the why-layer cheaply, not to index the repo.
+
 **Full fidelity** when plans exist: intent is `✓` verified and drift detection works.
 **Degraded** on a bare repo: intent falls back to commit messages and code inference, and is marked `~` or `?`. Still useful — say so, and note which artifact would most improve future runs.
 

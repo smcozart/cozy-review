@@ -5,7 +5,9 @@
      history without maintaining a separate artifact that drifts out of sync with code. -->
 
 **Scope** {{RANGE}} · {{N}} commits{{UNCOMMITTED_NOTE}}
-**Context** {{TIER}} <!-- e.g. "plans + SYSTEM.md" / "commit messages only — no specs/ in this repo" -->
+**Context** {{TIER}} — {{NAME THE ARTIFACTS THAT ACTUALLY CARRIED INTENT, discovered or conventional.
+  e.g. "no specs/ or SYSTEM.md, but architecture_decisions.md (AD-nnn) and FINDINGS.md (PLG-nnn) carried it"}}
+{{PRIOR — briefings picked up, or "first review in this repo"}}
 
 Confidence: `✓` verified · `~` inferred · `?` no source — go look
 

@@ -19,6 +19,28 @@ git diff <range> -- <file>         # only for files you actually need to reason 
 
 State the resolved scope in one line, including the commit count and whether uncommitted work is included.
 
+### Nothing to review
+
+Say so plainly and stop — do not manufacture a review out of an empty range. The cases:
+
+- **No commits at all** (`git log` fails with "does not have any commits yet") — if files exist, everything is untracked; offer to review the working tree as the initial state. If not, there is nothing here.
+- **Clean tree, watermark at `HEAD`** — nothing new since last review. Name the last briefing and its date.
+- **Range is only merge commits** — review the merged content or say the range is empty of authored change.
+- **Range is entirely generated/vendored files** — say what they are and skip. Do not trace `package-lock.json`.
+- **`git rev-parse --show-toplevel` is above where the user pointed** — the repo root is a parent. Say so before reviewing, because the user's mental model of the repo boundary is wrong and every scope after this inherits the error.
+
+### Pick up the thread
+
+Before grouping, check `REVIEW_DIR/reviews/` for what is already established. The briefings are the ledger — a review that starts cold every time is the exact failure this design was meant to avoid.
+
+Bound it, because this runs on every review and the folder only grows: **the 3 most recent briefings whose components or paths overlap the current scope.** Not the whole folder, not briefings about untouched components.
+
+From them, carry forward:
+
+- **What is already explained** — do not re-derive it. Reference it and move on.
+- **Open questions and weakest links** — if a prior review flagged something unresolved and this change touches it, that is the first thing to check now.
+- **Contradictions.** If a prior briefing asserted something these changes make false — a component's responsibility moved, a claimed invariant broke, an owner changed — **say so explicitly**, citing the briefing and its date. Architectural drift shows up across reviews, never inside one. This is the only place cozyreview can catch it.
+
 ---
 
 ## 2. Group by intent, not by file
@@ -78,6 +100,18 @@ This check is the highest-value thing cozyreview does. Nothing else in the toolc
 - A new config key or env var → is there a default, and is it documented where the others are?
 - A branch of logic added → is there an error/empty/failure path for it?
 - A prompt or tool schema changed → do the evals, fixtures, or parsers that depend on its shape still match?
+
+**Mirror divergence — the twin that didn't move.** Repos carry the same artifact in more than one tree all the time: authoring vs. published, vendored copies, skill mirrors, monorepo duplication. When one copy changes and its twin doesn't, the copies silently diverge, and a fix can land in a tree that nothing ships.
+
+Fire this **only** when all three hold, or it becomes noise you learn to ignore:
+
+1. A changed file has a same-basename file elsewhere in the repo, **outside** ignored/generated paths.
+2. The two are **substantially the same artifact** — compare content, not just the name. Two unrelated `index.ts` or `README.md` files are not twins.
+3. **Only one of them changed** in this range.
+
+Then say which copy moved, which didn't, and — the part that matters — **which one ships**. If you cannot tell which is authoritative, that is itself the finding: name both and say what would settle it.
+
+Skip entirely for files whose duplication is structural and expected: `package.json`, lockfiles, per-package configs, test fixtures.
 
 **Convention break.** Contradicts `STACK.md`, an ADR, `CLAUDE.md`, or the dominant pattern in surrounding code. Say which rule and where it lives.
 
