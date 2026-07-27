@@ -105,9 +105,13 @@ Verify matcher syntax against current Claude Code hook docs when you install, an
 Bare skill — no plugin, no hooks:
 
 ```
-npx skills add ./skills/cozyreview
+npx skills add smcozart/cozy-review
 ```
 
-Or drop `skills/cozyreview/` into `.claude/skills/` (project) or `~/.claude/skills/` (global).
+Installs project-level by default; add `-g` for global. On Windows the installer
+symlinks (junctions) into your agent directories — pass `--copy` if you'd rather
+have real files, e.g. so the skill travels with a repo you commit.
+
+Or clone and drop `skills/cozyreview/` straight into `.claude/skills/` (project) or `~/.claude/skills/` (global). The skill is four plain markdown files with no build step and no dependencies.
 
 Packaging as a plugin only buys one thing: a pre-push hook that warns when unreviewed commits pile up. Worth doing once the skill has proved itself in daily use — not before.
